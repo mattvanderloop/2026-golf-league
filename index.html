@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>2026 Golf League</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --safe-top:env(safe-area-inset-top, 0px);
+      --app-height:100dvh;
+      --bg:#0b1110;
+      --panel:#111a18;
+      --panel-2:#17221f;
+      --card:#ffffff;
+      --card-dark:#16211e;
+      --text:#f7faf8;
+      --muted:#9aa6a1;
+      --muted-2:#69736f;
+      --line:rgba(255,255,255,.09);
+      --line-dark:rgba(10,20,16,.1);
+      --green:#17b56b;
+      --green-dark:#07884e;
+      --green-soft:#dff6eb;
+      --red:#ff1639;
+      --orange:#ffac27;
+      --blue:#2f8cff;
+      --navy:#273946;
+      --shadow:0 16px 40px rgba(0,0,0,.25);
+      --radius:18px;
+      --safe-bottom:env(safe-area-inset-bottom, 0px);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(23,181,107,.2), transparent 34%),
+        linear-gradient(180deg,#09100f 0%, #111816 100%);
+      color:var(--text);
+      overflow:hidden;
+      min-height:100svh;
+      min-height:100dvh;
+      padding:0;
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer;border:0}
+    .app{
+      max-width:520px;
+      height:var(--app-height);
+      min-height:100svh;
+      margin:0 auto;
+      background:var(--bg);
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 30px 80px rgba(0,0,0,.5);
+    }
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      height:calc(76px + var(--safe-top));
+      padding:calc(14px + var(--safe-top)) 16px 10px;
+      background:rgba(11,17,16,.92);
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid var(--line);
+      display:flex;align-items:flex-end;gap:12px;
+    }
+    .brand{flex:1;min-width:0}
+    .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--green);font-weight:800}
+    h1{font-family:"Barlow Condensed",Inter,sans-serif;font-size:31px;line-height:.92;margin:2px 0 0;text-transform:uppercase;letter-spacing:.02em}
+    .week-pill{font-size:12px;color:#0b1411;background:var(--green);font-weight:800;border-radius:999px;padding:7px 10px;white-space:nowrap}
+    .icon-btn{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.07);color:var(--text);display:grid;place-items:center;border:1px solid var(--line)}
+    .main{height:calc(var(--app-height) - (76px + var(--safe-top)) - 76px - var(--safe-bottom));overflow:auto;padding:14px 14px 26px;scroll-behavior:smooth}
+    .main::-webkit-scrollbar{display:none}
+    .bottom-nav{
+      position:absolute;bottom:0;left:0;right:0;z-index:30;
+      height:calc(76px + var(--safe-bottom));
+      padding:9px 6px calc(8px + var(--safe-bottom));
+      background:rgba(249,250,249,.96);
+      backdrop-filter:blur(18px);
+      border-top:1px solid rgba(0,0,0,.08);
+      display:grid;grid-template-columns:repeat(5,1fr);gap:2px;
+      color:#777;
+    }
+    .nav-item{background:transparent;border-radius:14px;color:#777;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;font-weight:800}
+    .nav-item .nav-ico{font-size:21px;line-height:1}
+    .nav-item.active{color:var(--green);background:rgba(23,181,107,.1)}
+    .card{background:var(--card);color:#29312f;border-radius:var(--radius);box-shadow:0 10px 24px rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.68);overflow:hidden;margin-bottom:12px}
+    .card.dark{background:var(--panel);color:var(--text);border:1px solid var(--line);box-shadow:none}
+    .card-pad{padding:14px}
+    .section-title{font-family:"Barlow Condensed";font-size:24px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 10px;color:inherit;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .subtle{color:var(--muted);font-size:12px;font-weight:700}
+    .grid{display:grid;gap:10px}
+    .grid.two{grid-template-columns:1fr 1fr}
+    .stat-hero{
+      display:grid;grid-template-columns:1.1fr .9fr;gap:10px;align-items:stretch;margin-bottom:12px;
+    }
+    .live-card{background:linear-gradient(145deg,#0fbf70,#047c48);border-radius:20px;padding:16px;color:white;min-height:138px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+    .live-card:after{content:"";position:absolute;right:-28px;bottom:-38px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.12)}
+    .big-score{font-family:"Barlow Condensed";font-size:58px;line-height:.88;font-weight:800;margin:12px 0 0}
+    .mini-kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;opacity:.8}
+    .quick-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:13px;color:white}
+    .quick-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+    .quick-row:last-child{border-bottom:0}
+    .metric{font-family:"Barlow Condensed";font-size:28px;font-weight:800}
+    .segmented{display:flex;background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:16px;padding:3px;margin-bottom:12px;gap:3px;overflow:auto}
+    .segmented button{flex:1;min-width:max-content;border-radius:13px;background:transparent;color:var(--muted);padding:9px 12px;font-weight:900}
+    .segmented button.active{background:var(--green);color:white;box-shadow:0 7px 18px rgba(23,181,107,.22)}
+    .table{width:100%;border-collapse:separate;border-spacing:0 7px;font-size:12px}
+    .table th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:0 8px 3px;white-space:nowrap}
+    .table td{background:white;color:#27312e;padding:12px 8px;border-top:1px solid #edf0ee;border-bottom:1px solid #edf0ee;font-weight:800;vertical-align:middle}
+    .table td:first-child{border-radius:13px 0 0 13px;border-left:1px solid #edf0ee}
+    .table td:last-child{border-radius:0 13px 13px 0;border-right:1px solid #edf0ee}
+    .name-cell{display:flex;align-items:center;gap:8px;min-width:120px}
+    .rank{font-family:"Barlow Condensed";font-size:25px;color:#111}
+    .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#17b56b,#273946);display:grid;place-items:center;color:white;font-weight:900;font-size:12px;flex:0 0 auto}
+    .player-name{font-weight:900}.player-meta{font-size:10px;color:#8d9592;margin-top:2px}
+    .arrow-up{color:var(--green);font-weight:900}.arrow-down{color:var(--red);font-weight:900}.dash{color:#aaa}
+    .score-red{color:var(--red);font-family:"Barlow Condensed";font-size:28px;font-weight:800}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+    label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:900;display:block;margin:0 0 6px}
+    select,input{width:100%;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:#0e1715;color:var(--text);padding:11px 12px;outline:0}
+    .card select,.card input{background:#f4f6f5;color:#222;border:1px solid #dfe4e1}
+    .btn{background:var(--green);color:white;font-weight:900;border-radius:14px;padding:11px 14px;box-shadow:0 8px 18px rgba(23,181,107,.22)}
+    .btn.secondary{background:rgba(255,255,255,.08);border:1px solid var(--line);box-shadow:none;color:var(--text)}
+    .btn.danger{background:var(--red)}
+    .btn.small{padding:8px 10px;border-radius:11px;font-size:12px}
+    .scorecard-table{width:100%;border-collapse:collapse;background:white;color:#222;font-size:12px;border-radius:14px;overflow:hidden}
+    .scorecard-table th{background:#079457;color:white;padding:9px 4px;font-size:12px}
+    .scorecard-table td{border:1px solid #dfe3e1;text-align:center;padding:7px 3px;min-width:34px;font-weight:700}
+    .scorecard-table td.row-head{text-align:left;color:#59605d;background:#f6f7f6;font-weight:900;min-width:55px;padding-left:8px}
+    .score-input{width:34px;padding:6px 2px;text-align:center;border-radius:8px;background:#eef2f0!important;border:1px solid #ced8d3!important;color:#111!important;font-weight:900}
+    .stroke-dot{display:inline-grid;place-items:center;background:var(--green);color:white;border-radius:50%;width:18px;height:18px;font-size:10px;margin-left:4px}
+    .match-strip{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:12px;border-radius:16px;background:#f7f9f8;border:1px solid #e6ece8;color:#26312e;margin-bottom:10px}
+    .match-player{text-align:center}.vs{background:#2e3533;color:white;border-radius:10px;padding:7px 9px;font-family:"Barlow Condensed";font-size:23px;font-weight:800}
+    .points{font-family:"Barlow Condensed";font-size:36px;line-height:1;font-weight:800;color:#111}
+    .pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;background:rgba(23,181,107,.12);color:var(--green);font-size:11px;font-weight:900;white-space:nowrap}
+    .pill.red{background:rgba(255,22,57,.12);color:var(--red)}.pill.gray{background:#edf0ee;color:#68716d}.pill.orange{background:rgba(255,172,39,.15);color:#9d6500}
+    .week-card{background:white;color:#27312e;border-radius:17px;padding:12px;border:1px solid #edf0ee;box-shadow:0 8px 22px rgba(0,0,0,.13);margin-bottom:10px}
+    .week-card.current{outline:2px solid var(--green)}
+    .week-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .week-title{font-family:"Barlow Condensed";font-size:25px;font-weight:800;text-transform:uppercase}.week-card.collapsed .week-body{display:none}
+    .match-list{display:grid;gap:7px;margin-top:10px}.match-line{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;background:#f6f8f7;border-radius:12px;padding:8px;font-size:12px;font-weight:800}.team-line{font-size:11px;color:#646d69;text-align:center;margin-top:4px}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat-box{background:#f8faf9;border:1px solid #e8eeee;border-radius:16px;padding:10px;text-align:center}.stat-value{font-family:"Barlow Condensed";font-size:31px;font-weight:800;color:#17221f}.stat-label{font-size:10px;color:#848d89;text-transform:uppercase;font-weight:900}
+    .bar-chart{display:flex;gap:8px;align-items:end;height:108px;padding:14px 4px 0}.bar-wrap{flex:1;text-align:center}.bar{width:100%;border-radius:12px 12px 5px 5px;background:var(--green);min-height:8px}.bar.red{background:var(--red)}.bar.orange{background:var(--orange)}.bar.blue{background:var(--blue)}.bar-label{font-size:9px;font-weight:900;color:#626b67;margin-top:5px}.bar-pct{font-size:12px;font-weight:900;color:#0d2b20;margin-bottom:4px}
+    .drawer{position:absolute;inset:0;z-index:50;pointer-events:none}.drawer.open{pointer-events:auto}.shade{position:absolute;inset:0;background:rgba(0,0,0,.52);opacity:0;transition:.22s}.drawer.open .shade{opacity:1}.panel-drawer{position:absolute;top:0;right:0;width:min(440px,92%);height:100%;background:#f8faf9;color:#17221f;transform:translateX(105%);transition:.25s ease;box-shadow:-20px 0 50px rgba(0,0,0,.35);overflow:auto;padding:16px}.drawer.open .panel-drawer{transform:translateX(0)}
+    .admin-lock{display:grid;gap:10px;margin-top:18px}.admin-section{background:white;border:1px solid #e4e9e6;border-radius:16px;margin-bottom:10px;overflow:hidden}.admin-section summary{padding:14px;font-weight:900;cursor:pointer}.admin-body{padding:0 14px 14px}.admin-list{display:grid;gap:8px}.admin-row{display:grid;grid-template-columns:1fr 88px 92px;gap:8px;align-items:end;background:#f6f8f7;border-radius:12px;padding:8px}.admin-row.course{grid-template-columns:1fr 70px 70px 34px}.toggle{display:flex;background:#e9eeeb;border-radius:999px;padding:3px}.toggle button{flex:1;border-radius:999px;background:transparent;padding:7px 6px;font-size:11px;font-weight:900;color:#5d6662}.toggle button.active{background:var(--green);color:white}.toast{position:absolute;left:14px;right:14px;bottom:calc(86px + var(--safe-bottom));z-index:80;background:#121c19;color:white;border:1px solid var(--line);border-radius:15px;padding:12px 14px;box-shadow:var(--shadow);display:none;font-weight:800}.toast.show{display:block;animation:pop .2s ease}.empty{padding:24px;text-align:center;color:var(--muted);font-weight:800}.loader{height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent);position:absolute;left:0;right:0;top:calc(75px + var(--safe-top));display:none;animation:load 1s infinite}.loader.show{display:block}@keyframes load{from{transform:translateX(-100%)}to{transform:translateX(100%)}}@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @media (min-width:720px){body{padding:18px}.app{border-radius:28px;height:calc(var(--app-height) - 36px)}.main{height:calc(var(--app-height) - 36px - (76px + var(--safe-top)) - 76px - var(--safe-bottom))}}
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="eyebrow" id="liveEyebrow">Live League Hub</div>
+      <h1 id="pageTitle">Season Leaderboard</h1>
+    </div>
+    <div class="week-pill" id="weekPill">Week --</div>
+    <button class="icon-btn" id="adminOpen" aria-label="Open admin">☰</button>
+  </div>
+  <div class="loader" id="loader"></div>
+  <main class="main" id="main"></main>
+  <nav class="bottom-nav" id="bottomNav"></nav>
+  <div class="toast" id="toast"></div>
+  <div class="drawer" id="drawer">
+    <div class="shade" id="drawerShade"></div>
+    <aside class="panel-drawer" id="adminPanel"></aside>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  /**********************************************************************
+   * FIREBASE SETUP
+   * 1) Create a Firebase project
+   * 2) Enable Firestore
+   * 3) Replace the values below with your Firebase web app config
+   * 4) Host this file as index.html on GitHub Pages
+   **********************************************************************/
+  const firebaseConfig = {
+    apiKey: "PASTE_FIREBASE_API_KEY",
+    authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+    projectId: "PASTE_PROJECT_ID",
+    storageBucket: "PASTE_PROJECT_ID.appspot.com",
+    messagingSenderId: "PASTE_SENDER_ID",
+    appId: "PASTE_APP_ID"
+  };
+
+  const LEAGUE_ID = "2026-golf-league";
+  const ADMIN_PASSWORD = "golf2026";
+  const USE_FIREBASE = !firebaseConfig.apiKey.includes("PASTE_");
+  let db = null;
+  let unsub = null;
+
+  const DEFAULT_PLAYERS = ["Matt V.","John V.","Pete V.","Drew G.","Nick W.","David G.","David S.","Luke K."].map((name,i)=>({
+    id: slug(name), name, manualHcp: [7,8,9,10,11,12,13,14][i], calcHcp: null, hcpMode:"manual", active:true, movement:"flat", previousRank:i+1
+  }));
+
+  const DEFAULT_COURSES = [
+    {id:"reid-front", name:"Reid Golf Course (Front 9)", holes:[
+      {hole:1,par:5,difficulty:5},{hole:2,par:3,difficulty:3},{hole:3,par:4,difficulty:8},{hole:4,par:3,difficulty:7},{hole:5,par:4,difficulty:1},{hole:6,par:3,difficulty:9},{hole:7,par:5,difficulty:4},{hole:8,par:4,difficulty:6},{hole:9,par:4,difficulty:2}
+    ]},
+    {id:"reid-back", name:"Reid Golf Course (Back 9)", holes:[
+      {hole:1,par:5,difficulty:6},{hole:2,par:3,difficulty:5},{hole:3,par:4,difficulty:4},{hole:4,par:4,difficulty:3},{hole:5,par:4,difficulty:2},{hole:6,par:4,difficulty:1},{hole:7,par:5,difficulty:7},{hole:8,par:3,difficulty:8},{hole:9,par:4,difficulty:9}
+    ]}
+  ];
+
+  const state = {
+    tab:"leaderboard",
+    selectedPlayerId: DEFAULT_PLAYERS[0].id,
+    selectedStatsId: DEFAULT_PLAYERS[0].id,
+    scoreSubTab:"onevone",
+    statsRange:"season",
+    adminAuthed: sessionStorage.getItem("golfAdminAuthed")==="true",
+    data:null
+  };
+
+  const tabs = [
+    {id:"leaderboard", label:"Leaderboard", icon:"🏆", title:"Season Leaderboard"},
+    {id:"scorecard", label:"Scorecard", icon:"✎", title:"Scorecard"},
+    {id:"schedule", label:"Schedule", icon:"📅", title:"Schedule"},
+    {id:"stats", label:"Stats", icon:"▦", title:"Statistics"},
+    {id:"feed", label:"Game On", icon:"💬", title:"Game On"}
+  ];
+
+  function slug(v){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")}
+  function uid(prefix="id"){return prefix+"-"+Math.random().toString(36).slice(2,9)}
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
+  function round1(n){return Math.round((Number(n)||0)*10)/10}
+  function money(n){return (Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:1})}
+  function activeHcp(p){return round1(p?.hcpMode==="calculated" && p?.calcHcp!=null ? p.calcHcp : p?.manualHcp || 0)}
+  function coursePar(course){return course.holes.reduce((s,h)=>s+h.par,0)}
+  function currentWeek(data){return data.weeks.find(w=>w.status==="active") || data.weeks.find(w=>w.status!=="complete") || data.weeks[0]}
+  function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
+  function setLoading(on){document.getElementById("loader").classList.toggle("show",!!on)}
+
+  function generateSchedule(players, courses, weekCount=14){
+    const ids = players.map(p=>p.id);
+    const pairCounts = Object.fromEntries(ids.flatMap(a=>ids.filter(b=>b>a).map(b=>[[a,b].sort().join("|"),0])));
+    const weeks=[];
+    for(let w=1; w<=weekCount; w++){
+      const available=[...ids];
+      const onevone=[];
+      while(available.length){
+        const a=available.shift();
+        const b=available.slice().sort((x,y)=>(pairCounts[[a,x].sort().join("|")]||0)-(pairCounts[[a,y].sort().join("|")]||0))[0];
+        available.splice(available.indexOf(b),1);
+        pairCounts[[a,b].sort().join("|")]++;
+        onevone.push([a,b]);
+      }
+      const teamMatches = [
+        {teamA:[onevone[0][0],onevone[1][0]], teamB:[onevone[0][1],onevone[1][1]]},
+        {teamA:[onevone[2][0],onevone[3][0]], teamB:[onevone[2][1],onevone[3][1]]}
+      ];
+      weeks.push({id:"week-"+w, number:w, courseId:courses[(w-1)%courses.length].id, status:w===1?"active":"upcoming", onevone:onevone.map((m,i)=>({id:`w${w}-m${i+1}`, players:m})), teamMatches, subs:{}, locked:false});
+      ids.push(ids.shift());
+    }
+    return weeks;
+  }
+
+  function defaultData(){
+    return {
+      leagueName:"2026 Golf League",
+      updatedAt:null,
+      players:DEFAULT_PLAYERS,
+      substitutes:[],
+      courses:DEFAULT_COURSES,
+      weeks:generateSchedule(DEFAULT_PLAYERS, DEFAULT_COURSES, 14),
+      scores:{},
+      feed:[]
+    };
+  }
+
+  function localLoad(){
+    try{return JSON.parse(localStorage.getItem("golfLeagueData")) || defaultData()}catch{return defaultData()}
+  }
+  async function saveData(next){
+    next.updatedAt = Date.now();
+    state.data = next;
+    render();
+    if(USE_FIREBASE){
+      setLoading(true);
+      await setDoc(doc(db,"leagues",LEAGUE_ID), next, {merge:false}).catch(e=>showToast("Firebase save failed: "+e.message));
+      setLoading(false);
+    }else{
+      localStorage.setItem("golfLeagueData", JSON.stringify(next));
+      showToast("Saved locally. Add Firebase config for live syncing.");
+    }
+  }
+  function mutate(fn){const next=structuredClone(state.data);fn(next);recalculateAll(next);saveData(next)}
+
+  function scoreKey(weekId, playerId){return `${weekId}_${playerId}`}
+  function displayPlayerId(week, regularId){return week.subs?.[regularId]?.subId || regularId}
+  function displayName(data, week, regularId){
+    const sub = week.subs?.[regularId];
+    if(sub){const s=data.substitutes.find(x=>x.id===sub.subId); return `${s?.name||"Sub"} (${playerById(data,regularId)?.name})`}
+    return playerById(data,regularId)?.name || regularId;
+  }
+  function playerById(data,id){return data.players.find(p=>p.id===id) || data.substitutes.find(p=>p.id===id)}
+  function scoreObj(data, weekId, playerId){return data.scores[scoreKey(weekId,playerId)] || {holes:Array(9).fill(null)} }
+  function grossTotal(data, weekId, playerId){return scoreObj(data,weekId,playerId).holes.reduce((s,v)=>s+(Number(v)||0),0)}
+  function holesPlayed(data, weekId, playerId){return scoreObj(data,weekId,playerId).holes.filter(v=>Number(v)>0).length}
+  function strokesForHole(playerHcp, opponentHcp, holeDifficulty){
+    const diff = Math.max(0, Math.round(playerHcp - opponentHcp));
+    if(diff<=0) return 0;
+    return Math.floor((diff + (9 - holeDifficulty)) / 9);
+  }
+  function individualNetHole(data, week, course, regularId, opponentRegularId, i){
+    const pid=displayPlayerId(week,regularId), oid=displayPlayerId(week,opponentRegularId);
+    const gross=Number(scoreObj(data,week.id,pid).holes[i])||0;
+    if(!gross) return null;
+    const p=playerById(data,pid), o=playerById(data,oid);
+    return gross - strokesForHole(activeHcp(p), activeHcp(o), course.holes[i].difficulty);
+  }
+  function netTotalVs(data, week, course, regularId, opponentRegularId){
+    let total=0, played=0;
+    for(let i=0;i<9;i++){const n=individualNetHole(data,week,course,regularId,opponentRegularId,i); if(n!=null){total+=n;played++}}
+    return {total,played};
+  }
+  function matchPoints(data, week, match){
+    const course=data.courses.find(c=>c.id===week.courseId) || data.courses[0];
+    const [a,b]=match.players;
+    let aPts=0,bPts=0, played=0;
+    const holes=[];
+    for(let i=0;i<9;i++){
+      const an=individualNetHole(data,week,course,a,b,i), bn=individualNetHole(data,week,course,b,a,i);
+      let ap=0,bp=0;
+      if(an!=null && bn!=null){played++; if(an<bn)ap=2; else if(bn<an)bp=2; else {ap=1;bp=1}}
+      aPts+=ap;bPts+=bp;holes.push({hole:i+1, aNet:an, bNet:bn, aPts:ap, bPts:bp});
+    }
+    const at=netTotalVs(data,week,course,a,b), bt=netTotalVs(data,week,course,b,a);
+    let bonus={a:0,b:0};
+    if(at.played===9 && bt.played===9){ if(at.total<bt.total)bonus.a=2; else if(bt.total<at.total)bonus.b=2; else {bonus.a=1;bonus.b=1} }
+    return {aPts:aPts+bonus.a,bPts:bPts+bonus.b,holePts:{a:aPts,b:bPts},bonus,played,holes,aNet:at.total,bNet:bt.total};
+  }
+  function teamMatchPoints(data, week, tm){
+    const course=data.courses.find(c=>c.id===week.courseId) || data.courses[0];
+    const opponentMap={};
+    week.onevone.forEach(m=>{opponentMap[m.players[0]]=m.players[1];opponentMap[m.players[1]]=m.players[0]});
+    const total = team => team.reduce((s,regularId)=>s+netTotalVs(data,week,course,regularId,opponentMap[regularId]).total,0);
+    const played = team => team.every(regularId=>holesPlayed(data,week.id,displayPlayerId(week,regularId))===9);
+    const aTotal=total(tm.teamA), bTotal=total(tm.teamB);
+    let aPts=0,bPts=0;
+    if(played(tm.teamA)&&played(tm.teamB)){ if(aTotal<bTotal)aPts=4; else if(bTotal<aTotal)bPts=4; else {aPts=2;bPts=2} }
+    return {aTotal,bTotal,aPts,bPts,complete:played(tm.teamA)&&played(tm.teamB)};
+  }
+  function weekPointsForPlayer(data, week, regularId){
+    let pts=0;
+    const m=week.onevone.find(x=>x.players.includes(regularId));
+    if(m){const mp=matchPoints(data,week,m); pts += m.players[0]===regularId ? mp.aPts : mp.bPts;}
+    const tm=week.teamMatches.find(t=>t.teamA.includes(regularId)||t.teamB.includes(regularId));
+    if(tm){const tp=teamMatchPoints(data,week,tm); pts += tm.teamA.includes(regularId) ? tp.aPts : tp.bPts;}
+    return pts;
+  }
+  function isSubWeek(week, regularId){return !!week.subs?.[regularId]}
+  function playerRoundGrosses(data, regularId){
+    const rounds=[];
+    data.weeks.forEach(w=>{
+      const pid=displayPlayerId(w,regularId);
+      if(pid!==regularId) return;
+      const gross=grossTotal(data,w.id,regularId);
+      if(holesPlayed(data,w.id,regularId)===9){const c=data.courses.find(x=>x.id===w.courseId)||data.courses[0];rounds.push({weekId:w.id,gross,par:coursePar(c),diff:gross-coursePar(c)})}
+    });
+    return rounds;
+  }
+  function calculateHcpFromRounds(rounds){
+    if(!rounds.length) return null;
+    const last6=rounds.slice(-6);
+    const take=last6.length<=4 ? last6 : [...last6].sort((a,b)=>a.diff-b.diff).slice(0,4);
+    return clamp(round1((take.reduce((s,r)=>s+r.diff,0)/take.length)*.96),0,54);
+  }
+  function recalculateAll(data){
+    data.players.forEach(p=>{p.calcHcp=calculateHcpFromRounds(playerRoundGrosses(data,p.id))});
+    const ranked = buildLeaderboard(data,false);
+    ranked.forEach((row,idx)=>{
+      const p=data.players.find(x=>x.id===row.id);
+      const newRank=idx+1;
+      if(p.previousRank && newRank<p.previousRank) p.movement="up";
+      else if(p.previousRank && newRank>p.previousRank) p.movement="down";
+      p.previousRank=newRank;
+    });
+  }
+  function buildLeaderboard(data, applyMovement=true){
+    return data.players.filter(p=>p.active).map(p=>{
+      let total=0,w=0,l=0,t=0, best=null,worst=null;
+      data.weeks.forEach(week=>{
+        const pts=weekPointsForPlayer(data,week,p.id); total+=pts;
+        const gross=grossTotal(data,week.id,p.id);
+        if(holesPlayed(data,week.id,p.id)===9 && !isSubWeek(week,p.id)){best=best==null?gross:Math.min(best,gross); worst=worst==null?gross:Math.max(worst,gross)}
+        const m=week.onevone.find(x=>x.players.includes(p.id));
+        if(m){const mp=matchPoints(data,week,m); if(mp.played===9){const mine=m.players[0]===p.id?mp.aPts:mp.bPts; const theirs=m.players[0]===p.id?mp.bPts:mp.aPts; if(mine>theirs)w++; else if(theirs>mine)l++; else t++;}}
+      });
+      return {...p,totalPoints:round1(total), record:`${w}-${l}-${t}`, bestRound:best??"—", worstRound:worst??"—"}
+    }).sort((a,b)=>b.totalPoints-a.totalPoints || activeHcp(a)-activeHcp(b));
+  }
+  function playerStats(data, playerId){
+    const p=playerById(data,playerId), counts={eagle:0,birdie:0,par:0,bogey:0,double:0,triple:0,worse:0};
+    let best=null,worst=null, played=0, subbed=0, points=[]; let holesW=0,holesL=0,holesT=0; const results=[];
+    data.weeks.forEach(w=>{
+      if(isSubWeek(w,playerId)) subbed++;
+      const pid=displayPlayerId(w,playerId);
+      const gross=grossTotal(data,w.id,pid), hp=holesPlayed(data,w.id,pid);
+      const course=data.courses.find(c=>c.id===w.courseId)||data.courses[0];
+      if(hp===9){played++; if(pid===playerId){best=best==null?gross:Math.min(best,gross); worst=worst==null?gross:Math.max(worst,gross)}
+        scoreObj(data,w.id,pid).holes.forEach((s,i)=>{const d=(Number(s)||0)-course.holes[i].par; if(d<=-2)counts.eagle++; else if(d===-1)counts.birdie++; else if(d===0)counts.par++; else if(d===1)counts.bogey++; else if(d===2)counts.double++; else if(d===3)counts.triple++; else counts.worse++;});
+      }
+      const m=w.onevone.find(x=>x.players.includes(playerId));
+      if(m){const mp=matchPoints(data,w,m); mp.holes.forEach(h=>{const mine=m.players[0]===playerId?h.aPts:h.bPts; const theirs=m.players[0]===playerId?h.bPts:h.aPts; if(mine>theirs)holesW++; else if(theirs>mine)holesL++; else if(mine===1&&theirs===1)holesT++;}); if(mp.played===9){const mine=m.players[0]===playerId?mp.aPts:mp.bPts; const theirs=m.players[0]===playerId?mp.bPts:mp.aPts; results.push(mine>theirs?"W":theirs>mine?"L":"T")}}
+      points.push(weekPointsForPlayer(data,w,playerId));
+    });
+    let streak="—"; if(results.length){const last=results[results.length-1]; let n=0; for(let i=results.length-1;i>=0&&results[i]===last;i--) n++; streak=`${last}${n}`}
+    return {player:p, counts, best:best??"—", worst:worst??"—", played, subbed, holes:`${holesW}-${holesL}-${holesT}`, streak, avgPts:round1(points.reduce((a,b)=>a+b,0)/(points.length||1))};
+  }
+
+  function render(){
+    const data=state.data;if(!data)return;
+    const tab=tabs.find(t=>t.id===state.tab);
+    document.getElementById("pageTitle").textContent=tab.title;
+    const cw=currentWeek(data);
+    document.getElementById("weekPill").textContent=cw?`Week ${cw.number} • ${cw.status}`:"No Weeks";
+    document.getElementById("bottomNav").innerHTML=tabs.map(t=>`<button class="nav-item ${state.tab===t.id?'active':''}" data-tab="${t.id}"><span class="nav-ico">${t.icon}</span><span>${t.label}</span></button>`).join("");
+    document.getElementById("bottomNav").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
+    const main=document.getElementById("main");
+    main.innerHTML = state.tab==="leaderboard" ? renderLeaderboard(data) : state.tab==="scorecard" ? renderScorecard(data) : state.tab==="schedule" ? renderSchedule(data) : state.tab==="stats" ? renderStats(data) : renderFeed(data);
+    wirePage(data);
+    renderAdmin();
+  }
+
+  function renderLeaderboard(data){
+    const rows=buildLeaderboard(data);
+    const cw=currentWeek(data);
+    const leader=rows[0];
+    return `
+      <section class="stat-hero">
+        <div class="live-card">
+          <div class="mini-kicker">Season Leader</div>
+          <div class="big-score">${leader?.totalPoints||0}</div>
+          <div style="font-weight:900;margin-top:8px">${leader?.name||"—"}</div>
+          <div style="font-size:12px;opacity:.82;margin-top:3px">Total season points</div>
+        </div>
+        <div class="quick-card">
+          <div class="mini-kicker">Current Week</div>
+          <div class="quick-row"><span>Course</span><b>${data.courses.find(c=>c.id===cw?.courseId)?.name.replace("Reid Golf Course ","")||"—"}</b></div>
+          <div class="quick-row"><span>Status</span><b>${cw?.status||"—"}</b></div>
+          <div class="quick-row"><span>Posted</span><b>${countPosted(data,cw)}/8</b></div>
+        </div>
+      </section>
+      <div class="card dark card-pad">
+        <h2 class="section-title">Season Standings <span class="subtle">Live points</span></h2>
+      </div>
+      <table class="table">
+        <thead><tr><th>#</th><th>Golfer</th><th>Pts</th><th>HCP</th><th>W-L-T</th><th>Best</th><th>Worst</th></tr></thead>
+        <tbody>${rows.map((r,i)=>`
+          <tr>
+            <td><span class="rank">${i+1}</span></td>
+            <td><div class="name-cell"><span class="avatar">${initials(r.name)}</span><div><div class="player-name">${r.name}</div><div class="player-meta">${movementIcon(r.movement)} ${r.hcpMode} hcp</div></div></div></td>
+            <td class="score-red">${r.totalPoints}</td><td>${activeHcp(r)}</td><td>${r.record}</td><td>${r.bestRound}</td><td>${r.worstRound}</td>
+          </tr>`).join("")}</tbody>
+      </table>`;
+  }
+  function countPosted(data,week){if(!week)return 0;return data.players.filter(p=>holesPlayed(data,week.id,displayPlayerId(week,p.id))===9).length}
+  function movementIcon(m){return m==="up"?'<span class="arrow-up">▲ Up</span>':m==="down"?'<span class="arrow-down">▼ Down</span>':'<span class="dash">—</span>'}
+  function initials(name){return name.split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase()}
+
+  function renderScorecard(data){
+    const week=currentWeek(data); if(!week)return `<div class="empty">No active week.</div>`;
+    const course=data.courses.find(c=>c.id===week.courseId)||data.courses[0];
+    const playerId=state.selectedPlayerId; const player=playerById(data,displayPlayerId(week,playerId));
+    const match=week.onevone.find(m=>m.players.includes(playerId));
+    const opponentId=match?.players.find(x=>x!==playerId);
+    const scores=scoreObj(data,week.id,displayPlayerId(week,playerId)).holes;
+    return `
+      <div class="form-row"><div><label>Golfer Scorecard</label><select id="scorePlayer">${data.players.map(p=>`<option value="${p.id}" ${p.id===playerId?'selected':''}>${displayName(data,week,p.id)}</option>`).join("")}</select></div><div><label>Course</label><select id="weekCourse">${data.courses.map(c=>`<option value="${c.id}" ${c.id===week.courseId?'selected':''}>${c.name}</option>`).join("")}</select></div></div>
+      <div class="card card-pad">
+        <h2 class="section-title">${displayName(data,week,playerId)} <span class="pill">HCP ${activeHcp(player)}</span></h2>
+        <table class="scorecard-table">
+          <tr><th>Hole</th>${course.holes.map(h=>`<th>${h.hole}</th>`).join("")}<th>Out</th></tr>
+          <tr><td class="row-head">Par</td>${course.holes.map(h=>`<td>${h.par}</td>`).join("")}<td>${coursePar(course)}</td></tr>
+          <tr><td class="row-head">Diff</td>${course.holes.map(h=>`<td>${h.difficulty}</td>`).join("")}<td>—</td></tr>
+          <tr><td class="row-head">Score</td>${course.holes.map((h,i)=>`<td><input class="score-input" inputmode="numeric" data-hole="${i}" value="${scores[i]??''}" placeholder="-" /></td>`).join("")}<td>${grossTotal(data,week.id,displayPlayerId(week,playerId))||"—"}</td></tr>
+          <tr><td class="row-head">Net</td>${course.holes.map((h,i)=>`<td>${match?individualNetHole(data,week,course,playerId,opponentId,i)??"—":"—"}</td>`).join("")}<td>${match?netTotalVs(data,week,course,playerId,opponentId).total||"—":"—"}</td></tr>
+        </table>
+      </div>
+      <div class="segmented"><button class="${state.scoreSubTab==='onevone'?'active':''}" data-scoretab="onevone">1v1 Matchup</button><button class="${state.scoreSubTab==='team'?'active':''}" data-scoretab="team">2v2 Team</button></div>
+      ${state.scoreSubTab==='onevone'?renderOneVOne(data,week,match):renderTeam(data,week,playerId)}
+      <div class="card dark card-pad"><h2 class="section-title">Weekly Leaderboard <span class="subtle">Week ${week.number}</span></h2></div>
+      <table class="table"><thead><tr><th>#</th><th>Golfer</th><th>Pts</th><th>Gross</th><th>Thru</th></tr></thead><tbody>${data.players.map(p=>({p,pts:weekPointsForPlayer(data,week,p.id),gross:grossTotal(data,week.id,displayPlayerId(week,p.id)),thru:holesPlayed(data,week.id,displayPlayerId(week,p.id))})).sort((a,b)=>b.pts-a.pts).map((r,i)=>`<tr><td><span class="rank">${i+1}</span></td><td><div class="player-name">${displayName(data,week,r.p.id)}</div><div class="player-meta">HCP ${activeHcp(playerById(data,displayPlayerId(week,r.p.id)))}</div></td><td class="score-red">${r.pts}</td><td>${r.gross||"—"}</td><td>${r.thru}</td></tr>`).join("")}</tbody></table>`;
+  }
+  function renderOneVOne(data,week,match){
+    if(!match)return `<div class="empty">No matchup found.</div>`;
+    const [a,b]=match.players, mp=matchPoints(data,week,match), course=data.courses.find(c=>c.id===week.courseId)||data.courses[0];
+    const ap=playerById(data,displayPlayerId(week,a)), bp=playerById(data,displayPlayerId(week,b));
+    return `<div class="card card-pad">
+      <div class="match-strip"><div class="match-player"><b>${displayName(data,week,a)}</b><div class="subtle">HCP ${activeHcp(ap)}</div><div class="points">${mp.aPts}</div></div><div class="vs">VS</div><div class="match-player"><b>${displayName(data,week,b)}</b><div class="subtle">HCP ${activeHcp(bp)}</div><div class="points">${mp.bPts}</div></div></div>
+      <div class="subtle" style="margin-bottom:8px">Stroke holes are shown beside the golfer receiving the stroke.</div>
+      <table class="scorecard-table"><tr><th>Hole</th>${course.holes.map(h=>`<th>${h.hole}</th>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,a)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aNet??"—"}${strokesForHole(activeHcp(ap),activeHcp(bp),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,b)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].bNet??"—"}${strokesForHole(activeHcp(bp),activeHcp(ap),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">Pts</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aPts}-${mp.holes[i].bPts}</td>`).join("")}</tr></table>
+      <div class="grid two" style="margin-top:10px"><div class="stat-box"><div class="stat-label">Hole Points</div><div class="stat-value">${mp.holePts.a}-${mp.holePts.b}</div></div><div class="stat-box"><div class="stat-label">Net Bonus</div><div class="stat-value">${mp.bonus.a}-${mp.bonus.b}</div></div></div>
+    </div>`;
+  }
+  function renderTeam(data,week,playerId){
+    const tm=week.teamMatches.find(t=>t.teamA.includes(playerId)||t.teamB.includes(playerId)); if(!tm)return `<div class="empty">No team matchup.</div>`;
+    const tp=teamMatchPoints(data,week,tm);
+    return `<div class="card card-pad"><h2 class="section-title">2v2 Team Match <span class="pill">4 pts each</span></h2><div class="match-strip"><div class="match-player"><b>${tm.teamA.map(id=>displayName(data,week,id)).join(" + ")}</b><div class="subtle">Combined Net</div><div class="points">${tp.aTotal||"—"}</div><span class="pill">${tp.aPts} pts</span></div><div class="vs">VS</div><div class="match-player"><b>${tm.teamB.map(id=>displayName(data,week,id)).join(" + ")}</b><div class="subtle">Combined Net</div><div class="points">${tp.bTotal||"—"}</div><span class="pill">${tp.bPts} pts</span></div></div></div>`;
+  }
+  function renderSchedule(data){
+    return `<div class="card dark card-pad"><h2 class="section-title">League Schedule <button class="btn small" id="addWeekBtn">+ Week</button></h2><div class="subtle">Completed weeks collapse automatically so the next active week stays easy to find.</div></div>${data.weeks.map(w=>renderWeek(data,w)).join("")}`
+  }
+  function renderWeek(data,w){
+    const course=data.courses.find(c=>c.id===w.courseId)||data.courses[0];
+    return `<div class="week-card ${w.status==='active'?'current':''} ${w.status==='complete'?'collapsed':''}"><div class="week-head"><div><div class="week-title">Week ${w.number}</div><div class="subtle">${course.name}</div></div><span class="pill ${w.status==='complete'?'gray':w.status==='active'?'':'orange'}">${w.status}</span></div><div class="week-body"><div class="match-list">${w.onevone.map(m=>`<div><div class="match-line"><span>${displayName(data,w,m.players[0])}</span><b>1v1</b><span style="text-align:right">${displayName(data,w,m.players[1])}</span></div></div>`).join("")}${w.teamMatches.map(t=>`<div class="team-line">2v2: ${t.teamA.map(id=>displayName(data,w,id)).join(" + ")} vs ${t.teamB.map(id=>displayName(data,w,id)).join(" + ")}</div>`).join("")}</div></div></div>`
+  }
+  function renderStats(data){
+    const st=playerStats(data,state.selectedStatsId);
+    const total=Object.values(st.counts).reduce((a,b)=>a+b,0)||1;
+    const bars=[['Eagle','eagle','orange'],['Birdie','birdie','red'],['Par','par',''],['Bogey','bogey','blue'],['D.Bogey','double','']];
+    return `<div class="form-row"><div><label>Player Stats</label><select id="statsPlayer">${data.players.map(p=>`<option value="${p.id}" ${p.id===state.selectedStatsId?'selected':''}>${p.name}</option>`).join("")}</select></div><div><label>Range</label><select id="statsRange"><option>Season</option><option>Last 5</option><option>Last 20</option></select></div></div>
+      <div class="card card-pad"><h2 class="section-title">${st.player.name} <span class="pill">Current HCP ${activeHcp(st.player)}</span></h2><div class="grid two"><div class="stat-box"><div class="stat-label">Best Round</div><div class="stat-value">${st.best}</div></div><div class="stat-box"><div class="stat-label">Worst Round</div><div class="stat-value">${st.worst}</div></div><div class="stat-box"><div class="stat-label">Holes W-L-T</div><div class="stat-value" style="font-size:25px">${st.holes}</div></div><div class="stat-box"><div class="stat-label">Avg Pts/Week</div><div class="stat-value">${st.avgPts}</div></div></div></div>
+      <div class="card card-pad"><h2 class="section-title">Scoring Mix</h2><div class="bar-chart">${bars.map(([label,key,color])=>{const pct=Math.round(st.counts[key]/total*100);return `<div class="bar-wrap"><div class="bar-pct">${pct}%</div><div class="bar ${color}" style="height:${Math.max(8,pct*1.8)}px"></div><div class="bar-label">${label}</div></div>`}).join("")}</div></div>
+      <div class="card card-pad"><h2 class="section-title">Season Details</h2><div class="stat-grid"><div class="stat-box"><div class="stat-value">${st.played}</div><div class="stat-label">Played</div></div><div class="stat-box"><div class="stat-value">${st.subbed}</div><div class="stat-label">Sub Weeks</div></div><div class="stat-box"><div class="stat-value">${st.streak}</div><div class="stat-label">Streak</div></div><div class="stat-box"><div class="stat-value">${st.counts.triple}</div><div class="stat-label">Triple</div></div><div class="stat-box"><div class="stat-value">${st.counts.worse}</div><div class="stat-label">Worse</div></div><div class="stat-box"><div class="stat-value">${st.counts.par}</div><div class="stat-label">Pars</div></div></div></div>`;
+  }
+  function renderFeed(data){
+    const week=currentWeek(data);
+    const rows=buildLeaderboard(data);
+    const posts=[
+      {tag:"Leaderboard", title:`${rows[0]?.name||"The field"} is setting the pace`, body:`${rows[0]?.totalPoints||0} total points has the clubhouse buzzing. The chase pack needs a response this week.`},
+      {tag:"Live Week", title:`Week ${week?.number||"—"} is ${week?.status||"pending"}`, body:`${countPosted(data,week)}/8 scorecards are complete. Match points update instantly as scores are entered.`},
+      {tag:"Handicap Watch", title:"Calculated indexes refresh after posted rounds", body:"The app uses the best 4 of the last 6 differentials × 0.96 once enough rounds are available."}
+    ];
+    return `<div class="card dark card-pad"><h2 class="section-title">Game On Feed <span class="subtle">Auto storylines</span></h2><div class="subtle">A live commentary feed can be connected to an AI endpoint later. These cards are generated from league data now.</div></div>${posts.map(p=>`<div class="card card-pad"><span class="pill">${p.tag}</span><h2 class="section-title" style="margin-top:10px">${p.title}</h2><p style="line-height:1.45;color:#59615e;font-weight:700">${p.body}</p></div>`).join("")}`;
+  }
+
+  function wirePage(data){
+    document.querySelectorAll("#scorePlayer").forEach(el=>el.onchange=e=>{state.selectedPlayerId=e.target.value;render()});
+    document.querySelectorAll("#statsPlayer").forEach(el=>el.onchange=e=>{state.selectedStatsId=e.target.value;render()});
+    document.querySelectorAll("[data-scoretab]").forEach(b=>b.onclick=()=>{state.scoreSubTab=b.dataset.scoretab;render()});
+    document.querySelectorAll(".score-input").forEach(input=>{
+      input.onchange=e=>{
+        const week=currentWeek(state.data), pid=displayPlayerId(week,state.selectedPlayerId), hole=Number(e.target.dataset.hole), val=e.target.value?clamp(parseInt(e.target.value,10),1,20):null;
+        mutate(d=>{const key=scoreKey(week.id,pid); if(!d.scores[key])d.scores[key]={holes:Array(9).fill(null)}; d.scores[key].holes[hole]=val; addFeed(d,`Score updated`,`${displayName(d,week,state.selectedPlayerId)} posted ${val||"—"} on hole ${hole+1}.`)});
+      }
+    });
+    document.querySelectorAll("#weekCourse").forEach(el=>el.onchange=e=>{const week=currentWeek(data);mutate(d=>{d.weeks.find(w=>w.id===week.id).courseId=e.target.value})});
+    document.querySelectorAll("#addWeekBtn").forEach(b=>b.onclick=()=>mutate(d=>addWeek(d)));
+  }
+  function addFeed(data,title,body){data.feed = [{id:uid("feed"),title,body,ts:Date.now()},...(data.feed||[])].slice(0,40)}
+  function normalizeTeamMatches(week){
+    const all = week.onevone.flatMap(m=>m.players);
+    if(new Set(all).size !== 8) return;
+    week.teamMatches = [
+      {teamA:[week.onevone[0].players[0], week.onevone[1].players[0]], teamB:[week.onevone[0].players[1], week.onevone[1].players[1]]},
+      {teamA:[week.onevone[2].players[0], week.onevone[3].players[0]], teamB:[week.onevone[2].players[1], week.onevone[3].players[1]]}
+    ];
+  }
+  function addWeek(d){const n=d.weeks.length+1; const extra=generateSchedule(d.players,d.courses,n).at(-1); extra.number=n; extra.id="week-"+n; extra.status="upcoming"; d.weeks.push(extra)}
+
+  function renderAdmin(){
+    const drawer=document.getElementById("drawer"), panel=document.getElementById("adminPanel");
+    if(!state.data)return;
+    if(!state.adminAuthed){panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><h2 class="section-title">Admin Login</h2><button class="icon-btn" id="adminClose" style="color:#17221f;background:#eef2f0">×</button></div><div class="admin-lock"><label>Password</label><input id="adminPassword" type="password" placeholder="Enter admin password"/><button class="btn" id="adminLogin">Unlock Admin</button><div class="subtle">Default password in this file: golf2026. Change ADMIN_PASSWORD before launch.</div></div>`}
+    else{panel.innerHTML=adminContent(state.data)}
+    document.getElementById("adminOpen").onclick=()=>drawer.classList.add("open");
+    document.getElementById("drawerShade").onclick=()=>drawer.classList.remove("open");
+    document.querySelectorAll("#adminClose").forEach(b=>b.onclick=()=>drawer.classList.remove("open"));
+    document.querySelectorAll("#adminLogin").forEach(b=>b.onclick=()=>{const pw=document.getElementById("adminPassword").value; if(pw===ADMIN_PASSWORD){state.adminAuthed=true;sessionStorage.setItem("golfAdminAuthed","true");renderAdmin()}else showToast("Incorrect password")});
+    wireAdmin();
+  }
+  function adminContent(data){
+    return `<div style="display:flex;justify-content:space-between;align-items:center"><h2 class="section-title">Admin Panel</h2><button class="icon-btn" id="adminClose" style="color:#17221f;background:#eef2f0">×</button></div>
+      <details class="admin-section" open><summary>Golfers</summary><div class="admin-body admin-list">${data.players.map(p=>`<div class="admin-row"><div><label>Name</label><input data-admin="pname" data-id="${p.id}" value="${p.name}"></div><div><label>Manual</label><input data-admin="hcp" data-id="${p.id}" type="number" step=".1" value="${p.manualHcp}"></div><div><label>Type</label><div class="toggle"><button data-mode="manual" data-id="${p.id}" class="${p.hcpMode==='manual'?'active':''}">Man</button><button data-mode="calculated" data-id="${p.id}" class="${p.hcpMode==='calculated'?'active':''}">Calc</button></div></div></div>`).join("")}<button class="btn" id="addPlayer">+ Add Golfer</button></div></details>
+      <details class="admin-section"><summary>Schedule / Matchups</summary><div class="admin-body"><div class="admin-list">${data.weeks.map(w=>`<details class="admin-section" ${w.status==='active'?'open':''}><summary style="font-weight:900;padding:10px;cursor:pointer">Week ${w.number} • ${w.status} • ${data.courses.find(c=>c.id===w.courseId)?.name || 'Course TBD'}</summary><div class="admin-body"><div class="admin-row"><div><label>Status</label><select data-admin="weekStatus" data-id="${w.id}"><option ${w.status==='upcoming'?'selected':''}>upcoming</option><option ${w.status==='active'?'selected':''}>active</option><option ${w.status==='complete'?'selected':''}>complete</option></select></div><div><label>Course</label><select data-admin="weekCourse" data-id="${w.id}">${data.courses.map(c=>`<option value="${c.id}" ${c.id===w.courseId?'selected':''}>${c.name}</option>`).join("")}</select></div><button class="btn small secondary" data-admin="endWeek" data-id="${w.id}">End</button></div><label style="margin-top:12px">1v1 Matchups</label>${w.onevone.map((m,idx)=>`<div class="admin-row"><div><label>Match ${idx+1} Player A</label><select data-admin="oneA" data-week="${w.id}" data-match="${idx}">${data.players.map(p=>`<option value="${p.id}" ${m.players[0]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><div><label>Player B</label><select data-admin="oneB" data-week="${w.id}" data-match="${idx}">${data.players.map(p=>`<option value="${p.id}" ${m.players[1]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><button class="btn small secondary" data-admin="swapOne" data-week="${w.id}" data-match="${idx}">Swap</button></div>`).join("")}<label style="margin-top:12px">2v2 Team Matchups</label>${w.teamMatches.map((tm,idx)=>`<div class="admin-section"><summary style="display:block;font-weight:900;padding:10px">Team Match ${idx+1}</summary><div class="admin-body"><div class="admin-row"><div><label>Team A Player 1</label><select data-admin="teamPlayer" data-week="${w.id}" data-team-match="${idx}" data-side="teamA" data-slot="0">${data.players.map(p=>`<option value="${p.id}" ${tm.teamA[0]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><div><label>Team A Player 2</label><select data-admin="teamPlayer" data-week="${w.id}" data-team-match="${idx}" data-side="teamA" data-slot="1">${data.players.map(p=>`<option value="${p.id}" ${tm.teamA[1]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><button class="btn small secondary" data-admin="swapTeamSide" data-week="${w.id}" data-team-match="${idx}" data-side="teamA">Swap</button></div><div class="admin-row"><div><label>Team B Player 1</label><select data-admin="teamPlayer" data-week="${w.id}" data-team-match="${idx}" data-side="teamB" data-slot="0">${data.players.map(p=>`<option value="${p.id}" ${tm.teamB[0]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><div><label>Team B Player 2</label><select data-admin="teamPlayer" data-week="${w.id}" data-team-match="${idx}" data-side="teamB" data-slot="1">${data.players.map(p=>`<option value="${p.id}" ${tm.teamB[1]===p.id?'selected':''}>${p.name}</option>`).join("")}</select></div><button class="btn small secondary" data-admin="swapTeamSide" data-week="${w.id}" data-team-match="${idx}" data-side="teamB">Swap</button></div></div></div>`).join("")}<div class="subtle">Tip: Keep each regular golfer listed once per 1v1 set and once per 2v2 set for clean weekly scoring.</div></div></details>`).join("")}</div><button class="btn" id="adminAddWeek" style="margin-top:10px">+ Add Week</button></div></details>
+      <details class="admin-section"><summary>Courses</summary><div class="admin-body"><div class="admin-list">${data.courses.map(c=>`<div class="admin-section"><summary style="display:block;font-weight:900;padding:10px">${c.name}</summary><div class="admin-body"><label>Course Name</label><input data-admin="courseName" data-id="${c.id}" value="${c.name}">${c.holes.map((h,i)=>`<div class="admin-row course"><div><label>Hole ${i+1}</label><input readonly value="Hole ${i+1}"></div><div><label>Par</label><input data-admin="par" data-id="${c.id}" data-hole="${i}" type="number" value="${h.par}"></div><div><label>Diff</label><input data-admin="diff" data-id="${c.id}" data-hole="${i}" type="number" value="${h.difficulty}"></div><button class="btn small secondary" disabled>•</button></div>`).join("")}</div></div>`).join("")}</div><button class="btn" id="addCourse">+ Add Course</button></div></details>
+      <details class="admin-section"><summary>Substitutes</summary><div class="admin-body admin-list">${data.substitutes.map(s=>`<div class="admin-row"><div><label>Name</label><input data-admin="subName" data-id="${s.id}" value="${s.name}"></div><div><label>HCP</label><input data-admin="subHcp" data-id="${s.id}" type="number" step=".1" value="${s.manualHcp}"></div><button class="btn small danger" data-admin="removeSub" data-id="${s.id}">Remove</button></div>`).join("")}<button class="btn" id="addSub">+ Add Substitute</button><hr><label>Assign Sub For Current Week</label>${data.players.map(p=>`<div class="admin-row"><div><label>${p.name}</label><select data-admin="assignSub" data-id="${p.id}"><option value="">No sub</option>${data.substitutes.map(s=>`<option value="${s.id}" ${(currentWeek(data).subs?.[p.id]?.subId===s.id)?'selected':''}>${s.name}</option>`).join("")}</select></div><div></div><div></div></div>`).join("")}</div></details>`;
+  }
+  function wireAdmin(){
+    const data=state.data;
+    document.querySelectorAll("[data-admin='pname']").forEach(el=>el.onchange=e=>mutate(d=>{d.players.find(p=>p.id===e.target.dataset.id).name=e.target.value}));
+    document.querySelectorAll("[data-admin='hcp']").forEach(el=>el.onchange=e=>mutate(d=>{d.players.find(p=>p.id===e.target.dataset.id).manualHcp=Number(e.target.value)||0}));
+    document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>mutate(d=>{d.players.find(p=>p.id===b.dataset.id).hcpMode=b.dataset.mode}));
+    document.querySelectorAll("[data-admin='weekStatus']").forEach(el=>el.onchange=e=>mutate(d=>{if(e.target.value==='active')d.weeks.forEach(w=>{if(w.status==='active')w.status='upcoming'}); d.weeks.find(w=>w.id===e.target.dataset.id).status=e.target.value}));
+    document.querySelectorAll("[data-admin='weekCourse']").forEach(el=>el.onchange=e=>mutate(d=>{d.weeks.find(w=>w.id===e.target.dataset.id).courseId=e.target.value}));
+    document.querySelectorAll("[data-admin='oneA']").forEach(el=>el.onchange=e=>mutate(d=>{const w=d.weeks.find(x=>x.id===e.target.dataset.week); w.onevone[Number(e.target.dataset.match)].players[0]=e.target.value; normalizeTeamMatches(w)}));
+    document.querySelectorAll("[data-admin='oneB']").forEach(el=>el.onchange=e=>mutate(d=>{const w=d.weeks.find(x=>x.id===e.target.dataset.week); w.onevone[Number(e.target.dataset.match)].players[1]=e.target.value; normalizeTeamMatches(w)}));
+    document.querySelectorAll("[data-admin='swapOne']").forEach(b=>b.onclick=()=>mutate(d=>{const w=d.weeks.find(x=>x.id===b.dataset.week); const m=w.onevone[Number(b.dataset.match)]; m.players=[m.players[1],m.players[0]]; normalizeTeamMatches(w)}));
+    document.querySelectorAll("[data-admin='teamPlayer']").forEach(el=>el.onchange=e=>mutate(d=>{const w=d.weeks.find(x=>x.id===e.target.dataset.week); const tm=w.teamMatches[Number(e.target.dataset.teamMatch)]; tm[e.target.dataset.side][Number(e.target.dataset.slot)]=e.target.value}));
+    document.querySelectorAll("[data-admin='swapTeamSide']").forEach(b=>b.onclick=()=>mutate(d=>{const w=d.weeks.find(x=>x.id===b.dataset.week); const tm=w.teamMatches[Number(b.dataset.teamMatch)]; tm[b.dataset.side]=[tm[b.dataset.side][1],tm[b.dataset.side][0]]}));
+    document.querySelectorAll("[data-admin='endWeek']").forEach(b=>b.onclick=()=>mutate(d=>{const w=d.weeks.find(x=>x.id===b.dataset.id); if(countPosted(d,w)<8){showToast("All 8 scorecards must be posted before ending the week.");return} w.status='complete'; const next=d.weeks.find(x=>x.status==='upcoming'); if(next)next.status='active'}));
+    document.querySelectorAll("[data-admin='courseName']").forEach(el=>el.onchange=e=>mutate(d=>{d.courses.find(c=>c.id===e.target.dataset.id).name=e.target.value}));
+    document.querySelectorAll("[data-admin='par']").forEach(el=>el.onchange=e=>mutate(d=>{d.courses.find(c=>c.id===e.target.dataset.id).holes[Number(e.target.dataset.hole)].par=Number(e.target.value)||4}));
+    document.querySelectorAll("[data-admin='diff']").forEach(el=>el.onchange=e=>mutate(d=>{d.courses.find(c=>c.id===e.target.dataset.id).holes[Number(e.target.dataset.hole)].difficulty=Number(e.target.value)||1}));
+    document.querySelectorAll("[data-admin='subName']").forEach(el=>el.onchange=e=>mutate(d=>{d.substitutes.find(s=>s.id===e.target.dataset.id).name=e.target.value}));
+    document.querySelectorAll("[data-admin='subHcp']").forEach(el=>el.onchange=e=>mutate(d=>{d.substitutes.find(s=>s.id===e.target.dataset.id).manualHcp=Number(e.target.value)||0}));
+    document.querySelectorAll("[data-admin='removeSub']").forEach(b=>b.onclick=()=>mutate(d=>{d.substitutes=d.substitutes.filter(s=>s.id!==b.dataset.id)}));
+    document.querySelectorAll("[data-admin='assignSub']").forEach(el=>el.onchange=e=>mutate(d=>{const w=currentWeek(d); if(!w.subs)w.subs={}; if(e.target.value)w.subs[e.target.dataset.id]={subId:e.target.value}; else delete w.subs[e.target.dataset.id]}));
+    document.querySelectorAll("#addPlayer").forEach(b=>b.onclick=()=>mutate(d=>{const name="New Golfer";d.players.push({id:uid('player'),name,manualHcp:10,calcHcp:null,hcpMode:'manual',active:true,movement:'flat',previousRank:d.players.length+1})}));
+    document.querySelectorAll("#adminAddWeek").forEach(b=>b.onclick=()=>mutate(d=>addWeek(d)));
+    document.querySelectorAll("#addCourse").forEach(b=>b.onclick=()=>mutate(d=>{d.courses.push({id:uid('course'),name:'New Course',holes:Array.from({length:9},(_,i)=>({hole:i+1,par:4,difficulty:i+1}))})}));
+    document.querySelectorAll("#addSub").forEach(b=>b.onclick=()=>mutate(d=>{d.substitutes.push({id:uid('sub'),name:'New Sub',manualHcp:12,calcHcp:null,hcpMode:'manual',active:true})}));
+  }
+
+  async function boot(){
+    if(USE_FIREBASE){
+      try{
+        const app=initializeApp(firebaseConfig); db=getFirestore(app); setLoading(true);
+        const ref=doc(db,"leagues",LEAGUE_ID);
+        unsub=onSnapshot(ref, async snap=>{
+          if(!snap.exists()){await setDoc(ref, defaultData()); return;}
+          state.data=snap.data(); recalculateAll(state.data); setLoading(false); render();
+        }, err=>{setLoading(false); showToast("Firestore error: "+err.message); state.data=localLoad(); render();});
+      }catch(e){showToast("Firebase config not ready. Running locally."); state.data=localLoad(); recalculateAll(state.data); render();}
+    }else{state.data=localLoad(); recalculateAll(state.data); render();}
+  }
+  boot();
+</script>
+</body>
+</html>
