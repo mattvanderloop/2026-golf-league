@@ -128,9 +128,14 @@
     .btn.secondary{background:rgba(255,255,255,.08);border:1px solid var(--line);box-shadow:none;color:var(--text)}
     .btn.danger{background:var(--red)}
     .btn.small{padding:8px 10px;border-radius:11px;font-size:12px}
-    .scorecard-table{width:100%;border-collapse:collapse;background:white;color:#222;font-size:12px;border-radius:14px;overflow:hidden}
+    .scorecard-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+    .scorecard-scroll::-webkit-scrollbar{height:6px}
+    .scorecard-scroll::-webkit-scrollbar-thumb{background:#cbd5d0;border-radius:999px}
+    .scorecard-table{width:max-content;min-width:100%;border-collapse:collapse;background:white;color:#222;font-size:12px;border-radius:14px;overflow:hidden}
     .scorecard-table th{background:#079457;color:white;padding:9px 4px;font-size:12px}
-    .scorecard-table td{border:1px solid #dfe3e1;text-align:center;padding:7px 3px;min-width:34px;font-weight:700}
+    .scorecard-table td{border:1px solid #dfe3e1;text-align:center;padding:7px 3px;min-width:42px;font-weight:700}
+    .scorecard-table th{min-width:42px}
+    .scorecard-table th:first-child,.scorecard-table td.row-head{position:sticky;left:0;z-index:2}
     .scorecard-table td.row-head{text-align:left;color:#59605d;background:#f6f7f6;font-weight:900;min-width:55px;padding-left:8px}
     .score-input{width:34px;padding:6px 2px;text-align:center;border-radius:8px;background:#eef2f0!important;border:1px solid #ced8d3!important;color:#111!important;font-weight:900}
     .stroke-dot{display:inline-grid;place-items:center;background:var(--green);color:white;border-radius:50%;width:18px;height:18px;font-size:10px;margin-left:4px}
@@ -183,12 +188,12 @@
    * 4) Host this file as index.html on GitHub Pages
    **********************************************************************/
   const firebaseConfig = {
-    apiKey: "AIzaSyDdFNhmqw7ktzb8BxU4-lyRSTXv0lC7ZZ4",
-    authDomain: "golf-league-2026.firebaseapp.com",
-    projectId: "golf-league-2026",
-    storageBucket: "golf-league-2026.firebasestorage.app",
-    messagingSenderId: "601424643659",
-    appId: "1:601424643659:web:9ea6fdd5aa241265682fce"
+    apiKey: "PASTE_FIREBASE_API_KEY",
+    authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
+    projectId: "PASTE_PROJECT_ID",
+    storageBucket: "PASTE_PROJECT_ID.appspot.com",
+    messagingSenderId: "PASTE_SENDER_ID",
+    appId: "PASTE_APP_ID"
   };
 
   const LEAGUE_ID = "2026-golf-league";
@@ -225,7 +230,7 @@
     {id:"scorecard", label:"Scorecard", icon:"✎", title:"Scorecard"},
     {id:"schedule", label:"Schedule", icon:"📅", title:"Schedule"},
     {id:"stats", label:"Stats", icon:"▦", title:"Statistics"},
-    {id:"feed", label:"Game On", icon:"💬", title:"Game On"}
+    {id:"admin", label:"Admin", icon:"☰", title:"Admin"}
   ];
 
   function slug(v){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")}
@@ -426,7 +431,7 @@
     document.getElementById("bottomNav").innerHTML=tabs.map(t=>`<button class="nav-item ${state.tab===t.id?'active':''}" data-tab="${t.id}"><span class="nav-ico">${t.icon}</span><span>${t.label}</span></button>`).join("");
     document.getElementById("bottomNav").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;render()});
     const main=document.getElementById("main");
-    main.innerHTML = state.tab==="leaderboard" ? renderLeaderboard(data) : state.tab==="scorecard" ? renderScorecard(data) : state.tab==="schedule" ? renderSchedule(data) : state.tab==="stats" ? renderStats(data) : renderFeed(data);
+    main.innerHTML = state.tab==="leaderboard" ? renderLeaderboard(data) : state.tab==="scorecard" ? renderScorecard(data) : state.tab==="schedule" ? renderSchedule(data) : state.tab==="stats" ? renderStats(data) : renderAdminPage(data);
     wirePage(data);
     renderAdmin();
   }
@@ -478,13 +483,13 @@
       <div class="form-row"><div><label>Golfer Scorecard</label><select id="scorePlayer">${data.players.map(p=>`<option value="${p.id}" ${p.id===playerId?'selected':''}>${displayName(data,week,p.id)}</option>`).join("")}</select></div><div><label>Course</label><select id="weekCourse">${data.courses.map(c=>`<option value="${c.id}" ${c.id===week.courseId?'selected':''}>${c.name}</option>`).join("")}</select></div></div>
       <div class="card card-pad">
         <h2 class="section-title">${displayName(data,week,playerId)} <span class="pill">HCP ${activeHcp(player)}</span></h2>
-        <table class="scorecard-table">
+        <div class="scorecard-scroll"><table class="scorecard-table">
           <tr><th>Hole</th>${course.holes.map(h=>`<th>${h.hole}</th>`).join("")}<th>Out</th></tr>
           <tr><td class="row-head">Par</td>${course.holes.map(h=>`<td>${h.par}</td>`).join("")}<td>${coursePar(course)}</td></tr>
           <tr><td class="row-head">Diff</td>${course.holes.map(h=>`<td>${h.difficulty}</td>`).join("")}<td>—</td></tr>
           <tr><td class="row-head">Score</td>${course.holes.map((h,i)=>`<td><input class="score-input" inputmode="numeric" data-hole="${i}" value="${scores[i]??''}" placeholder="-" /></td>`).join("")}<td>${grossTotal(data,week.id,displayPlayerId(week,playerId))||"—"}</td></tr>
           <tr><td class="row-head">Net</td>${course.holes.map((h,i)=>`<td>${match?individualNetHole(data,week,course,playerId,opponentId,i)??"—":"—"}</td>`).join("")}<td>${match?netTotalVs(data,week,course,playerId,opponentId).total||"—":"—"}</td></tr>
-        </table>
+        </table></div>
       </div>
       <div class="segmented"><button class="${state.scoreSubTab==='onevone'?'active':''}" data-scoretab="onevone">1v1 Matchup</button><button class="${state.scoreSubTab==='team'?'active':''}" data-scoretab="team">2v2 Team</button></div>
       ${state.scoreSubTab==='onevone'?renderOneVOne(data,week,match):renderTeam(data,week,playerId)}
@@ -498,7 +503,7 @@
     return `<div class="card card-pad">
       <div class="match-strip"><div class="match-player"><b>${displayName(data,week,a)}</b><div class="subtle">HCP ${activeHcp(ap)}</div><div class="points">${mp.aPts}</div></div><div class="vs">VS</div><div class="match-player"><b>${displayName(data,week,b)}</b><div class="subtle">HCP ${activeHcp(bp)}</div><div class="points">${mp.bPts}</div></div></div>
       <div class="subtle" style="margin-bottom:8px">Stroke holes are shown beside the golfer receiving the stroke.</div>
-      <table class="scorecard-table"><tr><th>Hole</th>${course.holes.map(h=>`<th>${h.hole}</th>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,a)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aNet??"—"}${strokesForHole(activeHcp(ap),activeHcp(bp),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,b)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].bNet??"—"}${strokesForHole(activeHcp(bp),activeHcp(ap),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">Pts</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aPts}-${mp.holes[i].bPts}</td>`).join("")}</tr></table>
+      <div class="scorecard-scroll"><table class="scorecard-table"><tr><th>Hole</th>${course.holes.map(h=>`<th>${h.hole}</th>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,a)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aNet??"—"}${strokesForHole(activeHcp(ap),activeHcp(bp),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">${displayName(data,week,b)}</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].bNet??"—"}${strokesForHole(activeHcp(bp),activeHcp(ap),h.difficulty)?'<span class="stroke-dot">•</span>':''}</td>`).join("")}</tr><tr><td class="row-head">Pts</td>${course.holes.map((h,i)=>`<td>${mp.holes[i].aPts}-${mp.holes[i].bPts}</td>`).join("")}</tr></table></div>
       <div class="grid two" style="margin-top:10px"><div class="stat-box"><div class="stat-label">Hole Points</div><div class="stat-value">${mp.holePts.a}-${mp.holePts.b}</div></div><div class="stat-box"><div class="stat-label">Net Bonus</div><div class="stat-value">${mp.bonus.a}-${mp.bonus.b}</div></div></div>
     </div>`;
   }
@@ -523,18 +528,16 @@
       <div class="card card-pad"><h2 class="section-title">Scoring Mix</h2><div class="bar-chart">${bars.map(([label,key,color])=>{const pct=Math.round(st.counts[key]/total*100);return `<div class="bar-wrap"><div class="bar-pct">${pct}%</div><div class="bar ${color}" style="height:${Math.max(8,pct*1.8)}px"></div><div class="bar-label">${label}</div></div>`}).join("")}</div></div>
       <div class="card card-pad"><h2 class="section-title">Season Details</h2><div class="stat-grid"><div class="stat-box"><div class="stat-value">${st.played}</div><div class="stat-label">Played</div></div><div class="stat-box"><div class="stat-value">${st.subbed}</div><div class="stat-label">Sub Weeks</div></div><div class="stat-box"><div class="stat-value">${st.streak}</div><div class="stat-label">Streak</div></div><div class="stat-box"><div class="stat-value">${st.counts.triple}</div><div class="stat-label">Triple</div></div><div class="stat-box"><div class="stat-value">${st.counts.worse}</div><div class="stat-label">Worse</div></div><div class="stat-box"><div class="stat-value">${st.counts.par}</div><div class="stat-label">Pars</div></div></div></div>`;
   }
-  function renderFeed(data){
-    const week=currentWeek(data);
-    const rows=buildLeaderboard(data);
-    const posts=[
-      {tag:"Leaderboard", title:`${rows[0]?.name||"The field"} is setting the pace`, body:`${rows[0]?.totalPoints||0} total points has the clubhouse buzzing. The chase pack needs a response this week.`},
-      {tag:"Live Week", title:`Week ${week?.number||"—"} is ${week?.status||"pending"}`, body:`${countPosted(data,week)}/8 scorecards are complete. Match points update instantly as scores are entered.`},
-      {tag:"Handicap Watch", title:"Calculated indexes refresh after posted rounds", body:"The app uses the best 4 of the last 6 differentials × 0.96 once enough rounds are available."}
-    ];
-    return `<div class="card dark card-pad"><h2 class="section-title">Game On Feed <span class="subtle">Auto storylines</span></h2><div class="subtle">A live commentary feed can be connected to an AI endpoint later. These cards are generated from league data now.</div></div>${posts.map(p=>`<div class="card card-pad"><span class="pill">${p.tag}</span><h2 class="section-title" style="margin-top:10px">${p.title}</h2><p style="line-height:1.45;color:#59615e;font-weight:700">${p.body}</p></div>`).join("")}`;
+  function renderAdminPage(data){
+    if(!state.adminAuthed){
+      return `<div class="card dark card-pad"><h2 class="section-title">Admin</h2><div class="subtle">Enter the admin password to manage golfers, schedule, courses, substitutes, and weekly matchups.</div></div><div class="card card-pad"><label>Admin Password</label><input id="adminPasswordPage" type="password" placeholder="Enter admin password" style="margin-bottom:10px"><button class="btn" id="adminLoginPage">Unlock Admin</button><div class="subtle" style="margin-top:10px">Default password in this file: golf2026. Change ADMIN_PASSWORD before launch.</div></div>`;
+    }
+    return `<div class="card dark card-pad"><h2 class="section-title">Admin Dashboard <button class="btn small secondary" id="adminLogoutPage">Lock</button></h2><div class="subtle">Use the sections below to manage the league. Schedule weeks are collapsible.</div></div><div class="card card-pad">${adminContent(data)}</div>`;
   }
 
   function wirePage(data){
+    document.querySelectorAll("#adminLoginPage").forEach(b=>b.onclick=()=>{const pw=document.getElementById("adminPasswordPage")?.value; if(pw===ADMIN_PASSWORD){state.adminAuthed=true;sessionStorage.setItem("golfAdminAuthed","true");render()}else showToast("Incorrect password")});
+    document.querySelectorAll("#adminLogoutPage").forEach(b=>b.onclick=()=>{state.adminAuthed=false;sessionStorage.removeItem("golfAdminAuthed");render()});
     document.querySelectorAll("#scorePlayer").forEach(el=>el.onchange=e=>{state.selectedPlayerId=e.target.value;render()});
     document.querySelectorAll("#statsPlayer").forEach(el=>el.onchange=e=>{state.selectedStatsId=e.target.value;render()});
     document.querySelectorAll("[data-scoretab]").forEach(b=>b.onclick=()=>{state.scoreSubTab=b.dataset.scoretab;render()});
